@@ -5,7 +5,8 @@ from functools import partial
 from contextlib import suppress
 from typing import Dict
 
-from ytmusicapi.auth.headers import prepare_headers
+from requests.structures import CaseInsensitiveDict
+from ytmusicapi.auth.headers import load_headers_file, prepare_headers
 from ytmusicapi.parsers.i18n import Parser
 from ytmusicapi.helpers import *
 from ytmusicapi.mixins.browsing import BrowsingMixin
@@ -15,6 +16,7 @@ from ytmusicapi.mixins.explore import ExploreMixin
 from ytmusicapi.mixins.library import LibraryMixin
 from ytmusicapi.mixins.playlists import PlaylistsMixin
 from ytmusicapi.mixins.uploads import UploadsMixin
+from ytmusicapi.auth.oauth import YTMusicOAuth, is_oauth
 
 
 class YTMusic(BrowsingMixin, SearchMixin, WatchMixin, ExploreMixin, LibraryMixin, PlaylistsMixin,
@@ -30,7 +32,8 @@ class YTMusic(BrowsingMixin, SearchMixin, WatchMixin, ExploreMixin, LibraryMixin
                  user: str = None,
                  requests_session=True,
                  proxies: dict = None,
-                 language: str = 'en'):
+                 language: str = 'en',
+                 location: str = ''):
         """
         Create a new instance to interact with YouTube Music.
 
@@ -62,8 +65,13 @@ class YTMusic(BrowsingMixin, SearchMixin, WatchMixin, ExploreMixin, LibraryMixin
         :param language: Optional. Can be used to change the language of returned data.
             English will be used by default. Available languages can be checked in
             the ytmusicapi/locales directory.
+        :param location: Optional. Can be used to change the location of the user.
+            No location will be set by default. This means it is determined by the server.
+            Available languages can be checked in the FAQ.
         """
         self.auth = auth
+        self.input_dict = None
+        self.is_oauth_auth = False
 
         if isinstance(requests_session, requests.Session):
             self._session = requests_session
@@ -76,26 +84,37 @@ class YTMusic(BrowsingMixin, SearchMixin, WatchMixin, ExploreMixin, LibraryMixin
 
         self.proxies = proxies
         self.cookies = {'CONSENT': 'YES+1'}
+        if self.auth is not None:
+            input_json = load_headers_file(self.auth)
+            self.input_dict = CaseInsensitiveDict(input_json)
+            self.input_dict['filepath'] = self.auth
+            self.is_oauth_auth = is_oauth(self.input_dict)
 
-        self.headers = prepare_headers(self._session, proxies, auth)
+        self.headers = prepare_headers(self._session, proxies, self.input_dict)
 
         if 'x-goog-visitor-id' not in self.headers:
             self.headers.update(get_visitor_id(self._send_get_request))
 
         # prepare context
         self.context = initialize_context()
-        self.context['context']['client']['hl'] = language
-        locale_dir = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'locales'
-        supported_languages = [f for f in next(os.walk(locale_dir))[1]]
-        if language not in supported_languages:
+
+        if location:
+            if location not in SUPPORTED_LOCATIONS:
+                raise Exception("Location not supported. Check the FAQ for supported locations.")
+            self.context['context']['client']['gl'] = location
+
+        if language not in SUPPORTED_LANGUAGES:
             raise Exception("Language not supported. Supported languages are "
-                            + (', '.join(supported_languages)) + ".")
+                            + (', '.join(SUPPORTED_LANGUAGES)) + ".")
+        self.context['context']['client']['hl'] = language
         self.language = language
         try:
             locale.setlocale(locale.LC_ALL, self.language)
         except locale.Error:
             with suppress(locale.Error):
                 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
+        locale_dir = os.path.abspath(os.path.dirname(__file__)) + os.sep + 'locales'
         self.lang = gettext.translation('base', localedir=locale_dir, languages=[language])
         self.parser = Parser(self.lang)
 
@@ -111,7 +130,12 @@ class YTMusic(BrowsingMixin, SearchMixin, WatchMixin, ExploreMixin, LibraryMixin
             except KeyError:
                 raise Exception("Your cookie is missing the required value __Secure-3PAPISID")
 
+
+
     def _send_request(self, endpoint: str, body: Dict, additionalParams: str = "") -> Dict:
+
+        if self.is_oauth_auth:
+            self.headers = prepare_headers(self._session, self.proxies, self.input_dict) 
         body.update(self.context)
         params = YTM_PARAMS
         if self.is_browser_auth:

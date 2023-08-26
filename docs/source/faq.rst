@@ -49,6 +49,13 @@ Can I download songs?
 ***********************************************************************
 You can use `youtube-dl <https://github.com/ytdl-org/youtube-dl/>`_ for this purpose.
 
+How do I package ytmusicapi with ``pyinstaller``?
+*************************************************
+
+To package ytmusicapi correctly, you need to add the locales files to your executable.
+
+You can use ``--add-data path-to-ytmusicapi/locales`` or ``--collect-all ytmusicapi`` to accomplish this.
+
 
 YouTube Music API Internals
 ------------------------------
@@ -91,4 +98,304 @@ YouTube Music always returns increments of a specific pagination value, usually 
 This is the case if a ytmusicapi method supports the ``limit`` parameter. The default value of the ``limit`` parameter
 indicates the server-side pagination increment. ytmusicapi will keep fetching continuations from the server until it has
 reached at least the ``limit`` parameter, and return all of these results.
+
+
+Which values can I use for languages?
+*************************************
+
+The `language` parameter determines the language of the returned results.
+``ytmusicapi`` only supports a subset of the languages supported by YouTube Music, as translations need to be done manually.
+Contributions are welcome, see `here for instructions <https://github.com/sigma67/ytmusicapi/tree/master/ytmusicapi/locales>`__.
+
+For the list of values you can use for the ``language`` parameter, see below:
+
+.. raw:: html
+
+   <details>
+   <summary><a>Supported locations</a></summary>
+
+.. container::
+
+    .. list-table::
+
+        * - Language
+          - Value
+        * - Arabic
+          - ar
+        * - German
+          - de
+        * - English (default)
+          - en
+        * - Spanish
+          - es
+        * - French
+          - fr
+        * - Hindi
+          - hi
+        * - Italian
+          - it
+        * - Japanese
+          - ja
+        * - Korean
+          - ko
+        * - Dutch
+          - nl
+        * - Portuguese
+          - pt
+        * - Russian
+          - ru
+        * - Turkish
+          - tr
+        * - Urdu
+          - ur
+        * - Chinese (Mainland)
+          - zh_CN
+        * - Chinese (Taiwan)
+          - zh_TW
+
+
+.. raw:: html
+
+   </details>
+
+
+
+Which values can I use for locations?
+*************************************
+
+Pick a value from the list below for your desired location and pass it using the ``location`` parameter.
+
+.. raw:: html
+
+   <details>
+   <summary><a>Supported locations</a></summary>
+
+.. container::
+
+    .. list-table::
+
+        * - Location
+          - Value
+        * - Algeria
+          - DZ
+        * - Argentina
+          - AR
+        * - Australia
+          - AU
+        * - Austria
+          - AT
+        * - Azerbaijan
+          - AZ
+        * - Bahrain
+          - BH
+        * - Bangladesh
+          - BD
+        * - Belarus
+          - BY
+        * - Belgium
+          - BE
+        * - Bolivia
+          - BO
+        * - Bosnia and Herzegovina
+          - BA
+        * - Brazil
+          - BR
+        * - Bulgaria
+          - BG
+        * - Cambodia
+          - KH
+        * - Canada
+          - CA
+        * - Chile
+          - CL
+        * - Colombia
+          - CO
+        * - Costa Rica
+          - CR
+        * - Croatia
+          - HR
+        * - Cyprus
+          - CY
+        * - Czechia
+          - CZ
+        * - Denmark
+          - DK
+        * - Dominican Republic
+          - DO
+        * - Ecuador
+          - EC
+        * - Egypt
+          - EG
+        * - El Salvador
+          - SV
+        * - Estonia
+          - EE
+        * - Finland
+          - FI
+        * - France
+          - FR
+        * - Georgia
+          - GE
+        * - Germany
+          - DE
+        * - Ghana
+          - GH
+        * - Greece
+          - GR
+        * - Guatemala
+          - GT
+        * - Honduras
+          - HN
+        * - Hong Kong
+          - HK
+        * - Hungary
+          - HU
+        * - Iceland
+          - IS
+        * - India
+          - IN
+        * - Indonesia
+          - ID
+        * - Iraq
+          - IQ
+        * - Ireland
+          - IE
+        * - Israel
+          - IL
+        * - Italy
+          - IT
+        * - Jamaica
+          - JM
+        * - Japan
+          - JP
+        * - Jordan
+          - JO
+        * - Kazakhstan
+          - KZ
+        * - Kenya
+          - KE
+        * - Kuwait
+          - KW
+        * - Laos
+          - LA
+        * - Latvia
+          - LV
+        * - Lebanon
+          - LB
+        * - Libya
+          - LY
+        * - Liechtenstein
+          - LI
+        * - Lithuania
+          - LT
+        * - Luxembourg
+          - LU
+        * - Malaysia
+          - MY
+        * - Malta
+          - MT
+        * - Mexico
+          - MX
+        * - Montenegro
+          - ME
+        * - Morocco
+          - MA
+        * - Nepal
+          - NP
+        * - Netherlands
+          - NL
+        * - New Zealand
+          - NZ
+        * - Nicaragua
+          - NI
+        * - Nigeria
+          - NG
+        * - North Macedonia
+          - MK
+        * - Norway
+          - NO
+        * - Oman
+          - OM
+        * - Pakistan
+          - PK
+        * - Panama
+          - PA
+        * - Papua New Guinea
+          - PG
+        * - Paraguay
+          - PY
+        * - Peru
+          - PE
+        * - Philippines
+          - PH
+        * - Poland
+          - PL
+        * - Portugal
+          - PT
+        * - Puerto Rico
+          - PR
+        * - Qatar
+          - QA
+        * - Romania
+          - RO
+        * - Russia
+          - RU
+        * - Saudi Arabia
+          - SA
+        * - Senegal
+          - SN
+        * - Serbia
+          - RS
+        * - Singapore
+          - SG
+        * - Slovakia
+          - SK
+        * - Slovenia
+          - SI
+        * - South Africa
+          - ZA
+        * - South Korea
+          - KR
+        * - Spain
+          - ES
+        * - Sri Lanka
+          - LK
+        * - Sweden
+          - SE
+        * - Switzerland
+          - CH
+        * - Taiwan
+          - TW
+        * - Tanzania
+          - TZ
+        * - Thailand
+          - TH
+        * - Tunisia
+          - TN
+        * - Turkey
+          - TR
+        * - Uganda
+          - UG
+        * - Ukraine
+          - UA
+        * - United Arab Emirates
+          - AE
+        * - United Kingdom
+          - GB
+        * - United States
+          - US
+        * - Uruguay
+          - UY
+        * - Venezuela
+          - VE
+        * - Vietnam
+          - VN
+        * - Yemen
+          - YE
+        * - Zimbabwe
+          - ZW
+
+.. raw:: html
+
+   </details>
 

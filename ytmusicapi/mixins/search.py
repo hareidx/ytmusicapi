@@ -19,8 +19,10 @@ class SearchMixin:
         :param filter: Filter for item types. Allowed values: ``songs``, ``videos``, ``albums``, ``artists``, ``playlists``, ``community_playlists``, ``featured_playlists``, ``uploads``.
           Default: Default search, including all types of items.
         :param scope: Search scope. Allowed values: ``library``, ``uploads``.
-            For uploads, no filter can be set! An exception will be thrown if you attempt to do so.
             Default: Search the public YouTube Music catalogue.
+            Changing scope from the default will reduce the number of settable filters. Setting a filter that is not permitted will throw an exception.
+            For uploads, no filter can be set.
+            For library, community_playlists and featured_playlists filter cannot be set.
         :param limit: Number of search results to return
           Default: 20
         :param ignore_spelling: Whether to ignore YTM spelling suggestions.
@@ -115,6 +117,14 @@ class SearchMixin:
                 "artist": "Oasis",
                 "shuffleId": "RDAOkjHYJjL1a3xspEyVkhHAsg",
                 "radioId": "RDEMkjHYJjL1a3xspEyVkhHAsg"
+              },
+              {
+                "category": "Profiles",
+                "resultType": "profile",
+                "title": "Taylor Swift Time",
+                "name": "@TaylorSwiftTime",
+                "browseId": "UCSCRK7XlVQ6fBdEl00kX6pQ",
+                "thumbnails": ...
               }
             ]
 
@@ -125,7 +135,7 @@ class SearchMixin:
         search_results = []
         filters = [
             'albums', 'artists', 'playlists', 'community_playlists', 'featured_playlists', 'songs',
-            'videos'
+            'videos', 'profiles'
         ]
         if filter and filter not in filters:
             raise Exception(
@@ -142,6 +152,11 @@ class SearchMixin:
             raise Exception(
                 "No filter can be set when searching uploads. Please unset the filter parameter when scope is set to "
                 "uploads. ")
+
+        if scope == scopes[0] and filter in filters[3:5]:
+            raise Exception(f"{filter} cannot be set when searching library. "
+                            f"Please use one of the following filters or leave out the parameter: "
+                            + ', '.join(filters[0:3] + filters[5:]))
 
         params = get_search_params(filter, scope, ignore_spelling)
         if params:
